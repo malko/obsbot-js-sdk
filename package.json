@@ -1,0 +1,26 @@
+{
+  "name": "obsbot-sdk",
+  "version": "1.0.0",
+  "description": "Node.js native module for OBSBOT webcams",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "install": "node-gyp rebuild",
+    "build": "node-gyp build"
+  },
+  "keywords": [
+    "obsbot",
+    "webcam",
+    "sdk"
+  ],
+  "author": "",
+  "license": "ISC",
+  "gypfile": true,
+  "dependencies": {
+    "node-addon-api": "^7.1.0"
+  },
+  "devDependencies": {
+    "node-gyp": "^10.1.0",
+    "jest": "^29.7.0"
+  }
+}
