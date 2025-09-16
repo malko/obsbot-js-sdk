@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Node.js native module for OBSBOT webcams",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
     "test": "jest",
     "install": "node-gyp rebuild",

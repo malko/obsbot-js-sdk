@@ -37,7 +37,11 @@ const MEET_FAMILY = [
     ObsbotProductType.ObsbotProdMeet2,
     ObsbotProductType.ObsbotProdMeetSE,
 ];
-// const TAIL_FAMILY = [ ... ];
+const TAIL_FAMILY = [
+    ObsbotProductType.ObsbotProdTailAir,
+    ObsbotProductType.ObsbotProdTail2,
+    ObsbotProductType.ObsbotProdTail2S,
+];
 
 function deviceFactory(nativeDevice) {
     const productType = nativeDevice.getProductType();

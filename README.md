@@ -147,6 +147,10 @@ Inherits from `BaseDevice` and adds the following methods.
 *   `getAiStatus()`: Returns an object with the current AI status, e.g., `{ gesture_target: true, main_mode: 1 }`.
 *   `setAiTrackingMode(mode)`: Sets the AI vertical tracking mode (for Tiny series). (e.g., `TinyDevice.AiVerticalTrackType.Headroom`).
 *   `setAiMode(mode, [sub_mode])`: Sets the main AI working mode (e.g., `TinyDevice.AiWorkMode.Human`, `TinyDevice.AiSubModeHuman.UpperBody`).
+*   `toggleGestureTarget(enable)`: Enables or disables gesture target selection.
+*   `toggleGestureZoom(enable)`: Enables or disables gesture zoom.
+*   `toggleGestureDynamicZoom(enable)`: Enables or disables dynamic gesture zoom.
+*   `toggleGestureMirror(enable)`: Enables or disables gesture mirroring.
 
 #### Preset Management
 *   `getPresetList()`: Returns an array of saved preset IDs.
@@ -168,6 +172,7 @@ Inherits from `BaseDevice` and adds the following methods.
 *   `setBlurLevel(level)`: Sets the intensity of the background blur (0-100).
 *   `selectBackgroundImage(index)`: Selects a custom background image.
 *   `deleteBackgroundImage(index)`: Deletes a custom background image.
+*   `toggleGestureZoom(enable)`: Enables or disables gesture zoom.
 
 ## Advanced Usage Examples
 
@@ -227,27 +232,5 @@ if (nativeDevices.length > 0) {
     // This may result in errors or unexpected behavior.
     const sn = nativeDevice.getSn();
     console.log(`Got SN from native device: ${sn}`);
-}
-```
-    */
-}
-```
-
-### Example 4: Check Device Capabilities
-
-```javascript
-const devices = obsbot.getDevList();
-if (devices.length > 0) {
-    const myDevice = devices[0];
-    const capabilities = myDevice.getCapabilities();
-
-    console.log('Device Capabilities:', capabilities);
-
-    if (capabilities.brightness) {
-        console.log(`Brightness range: ${capabilities.brightness.min} to ${capabilities.brightness.max}`);
-    }
-    if (capabilities.zoom) {
-        console.log(`Zoom range: ${capabilities.zoom.min / 100}x to ${capabilities.zoom.max / 100}x`);
-    }
 }
 ```

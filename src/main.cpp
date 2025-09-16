@@ -101,6 +101,8 @@ private:
     Napi::Value GetMeetStatus(const Napi::CallbackInfo& info);
     // New method for capabilities
     Napi::Value GetCapabilities(const Napi::CallbackInfo& info);
+    // New method for gesture control
+    Napi::Value SetGestureControl(const Napi::CallbackInfo& info);
 };
 
 Napi::FunctionReference DeviceWrap::constructor;
@@ -140,6 +142,8 @@ Napi::Object DeviceWrap::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("getMeetStatus", &DeviceWrap::GetMeetStatus),
         // New method for capabilities
         InstanceMethod("getCapabilities", &DeviceWrap::GetCapabilities),
+        // New method for gesture control
+        InstanceMethod("setGestureControl", &DeviceWrap::SetGestureControl),
     });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -528,6 +532,32 @@ Napi::Value DeviceWrap::GetCapabilities(const Napi::CallbackInfo& info) {
     }
 
     return capabilities;
+}
+
+Napi::Value DeviceWrap::SetGestureControl(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2 || !info[0].IsString() || !info[1].IsBoolean()) {
+        Napi::TypeError::New(env, "String and Boolean expected").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    std::string gesture_str = info[0].As<Napi::String>().Utf8Value();
+    bool enable = info[1].As<Napi::Boolean>().Value();
+    int32_t gesture_type = -1;
+
+    if (gesture_str == "target") gesture_type = 0;
+    else if (gesture_str == "zoom") gesture_type = 1;
+    else if (gesture_str == "dynamic_zoom") gesture_type = 2;
+    else if (gesture_str == "mirror") gesture_type = 3;
+    else if (gesture_str == "record") gesture_type = 4;
+
+    if (gesture_type == -1) {
+        Napi::TypeError::New(env, "Invalid gesture type string").ThrowAsJavaScriptException();
+        return env.Null();
+    }
+
+    int result = device_ ? device_->aiSetGestureCtrlIndividualR(gesture_type, enable) : -1;
+    return Napi::Number::New(env, result);
 }
 
 Napi::Value GetDevList(const Napi::CallbackInfo& info) {

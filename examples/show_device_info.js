@@ -36,7 +36,7 @@ function showDeviceInfo() {
         console.log('\n[Tiny AI Status]');
         const aiStatus = device.getAiStatus();
         printObject(aiStatus);
-				device.setAiMode(obsbot.TinyDevice.AiWorkMode.Desk, obsbot.TinyDevice.AiSubModeHuman.UpperBody);
+        device.setHDR(true);
       } else if (device instanceof obsbot.MeetDevice) {
         console.log('\n[Meet Status]');
         const meetStatus = device.getStatus();
