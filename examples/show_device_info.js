@@ -1,4 +1,4 @@
-const obsbot = require('../src/index');
+const obsbot = require('../src/index.ts');
 
 function printObject(obj, indent = '  ') {
   for (const [key, value] of Object.entries(obj)) {

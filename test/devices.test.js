@@ -1,4 +1,4 @@
-const obsbot = require('../src/index.js');
+const obsbot = require('../src/index.ts');
 
 describe('Device Classes', () => {
   let tinyDevice;

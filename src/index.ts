@@ -1,9 +1,9 @@
 const obsbot_native = require('../build/Release/obsbot_native.node');
-const BaseDevice = require('../lib/base_device.js');
-const TinyDevice = require('../lib/tiny_device.js');
+import {BaseDevice} from '../lib/base_device.ts';
+import {TinyDevice} from '../lib/tiny_device.ts';
+import { MeetDevice } from '../lib/meet_device.ts';
+import type { NativeDevice } from './types.ts';
 // Future device classes can be added here
-const MeetDevice = require('../lib/meet_device.js');
-// const TailDevice = require('./lib/tail_device.js);');
 
 const ObsbotProductType = {
     ObsbotProdTiny: 0,
@@ -43,7 +43,7 @@ const TAIL_FAMILY = [
     ObsbotProductType.ObsbotProdTail2S,
 ];
 
-function deviceFactory(nativeDevice) {
+function deviceFactory(nativeDevice: NativeDevice) {
     const productType = nativeDevice.getProductType();
 
     if (TINY_FAMILY.includes(productType)) {
@@ -57,8 +57,7 @@ function deviceFactory(nativeDevice) {
     // Fallback to the base device for unknown models
     return new BaseDevice(nativeDevice);
 }
-
-module.exports = {
+export const osbotSdk = {
     // --- High-level API ---
     initSDK: obsbot_native.initSDK,
     deinitSDK: obsbot_native.deinitSDK,
@@ -68,7 +67,7 @@ module.exports = {
      * @returns {BaseDevice[]}
      */
     getDevList: () => {
-        const nativeList = obsbot_native.getDevList();
+        const nativeList: NativeDevice[] = obsbot_native.getDevList();
         return nativeList.map(deviceFactory);
     },
     // Export classes and enums for external use and type checking
