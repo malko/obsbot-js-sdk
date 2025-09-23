@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"module": "nodenext",
 		"allowImportingTsExtensions": true,
 		"erasableSyntaxOnly": true,
 		"noEmit": true

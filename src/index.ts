@@ -1,8 +1,9 @@
-const obsbot_native = require('../build/Release/obsbot_native.node');
-import {BaseDevice} from '../lib/base_device.ts';
-import {TinyDevice} from '../lib/tiny_device.ts';
-import { MeetDevice } from '../lib/meet_device.ts';
-import type { NativeDevice } from './types.ts';
+import { createRequire } from "node:module"
+const obsbot_native = createRequire(import.meta.url)("../build/Release/obsbot_native.node")
+import { BaseDevice } from '../lib/base_device.ts'
+import { TinyDevice } from '../lib/tiny_device.ts'
+import { MeetDevice } from '../lib/meet_device.ts'
+import type { NativeDevice } from './types.ts'
 // Future device classes can be added here
 
 const ObsbotProductType = {
@@ -21,7 +22,7 @@ const ObsbotProductType = {
     ObsbotProdTinySE: 12,
     ObsbotProdMeetSE: 13,
     ObsbotProdTail2S: 16,
-};
+}
 
 const TINY_FAMILY = [
     ObsbotProductType.ObsbotProdTiny,
@@ -29,46 +30,46 @@ const TINY_FAMILY = [
     ObsbotProductType.ObsbotProdTiny2,
     ObsbotProductType.ObsbotProdTiny2Lite,
     ObsbotProductType.ObsbotProdTinySE,
-];
+]
 
 const MEET_FAMILY = [
     ObsbotProductType.ObsbotProdMeet,
     ObsbotProductType.ObsbotProdMeet4k,
     ObsbotProductType.ObsbotProdMeet2,
     ObsbotProductType.ObsbotProdMeetSE,
-];
+]
 const TAIL_FAMILY = [
     ObsbotProductType.ObsbotProdTailAir,
     ObsbotProductType.ObsbotProdTail2,
     ObsbotProductType.ObsbotProdTail2S,
-];
+]
 
 function deviceFactory(nativeDevice: NativeDevice) {
-    const productType = nativeDevice.getProductType();
+    const productType = nativeDevice.getProductType()
 
     if (TINY_FAMILY.includes(productType)) {
-        return new TinyDevice(nativeDevice);
+        return new TinyDevice(nativeDevice)
     }
     // Add more families here
     if (MEET_FAMILY.includes(productType)) {
-        return new MeetDevice(nativeDevice);
+        return new MeetDevice(nativeDevice)
     }
 
     // Fallback to the base device for unknown models
-    return new BaseDevice(nativeDevice);
+    return new BaseDevice(nativeDevice)
 }
 export const osbotSdk = {
     // --- High-level API ---
-    initSDK: obsbot_native.initSDK,
-    deinitSDK: obsbot_native.deinitSDK,
+    init: obsbot_native.initSDK,
+    release: obsbot_native.deinitSDK,
     setDevChangedCallback: obsbot_native.setDevChangedCallback,
     /**
      * Returns an array of model-specific device instances (e.g., TinyDevice).
      * @returns {BaseDevice[]}
      */
     getDevList: () => {
-        const nativeList: NativeDevice[] = obsbot_native.getDevList();
-        return nativeList.map(deviceFactory);
+        const nativeList: NativeDevice[] = obsbot_native.getDevList()
+        return nativeList.map(deviceFactory)
     },
     // Export classes and enums for external use and type checking
     ObsbotProductType,
@@ -81,4 +82,4 @@ export const osbotSdk = {
      * Direct access to the underlying native module and its raw Device objects.
      */
     native: obsbot_native
-};
+}
