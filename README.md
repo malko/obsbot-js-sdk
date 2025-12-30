@@ -180,7 +180,7 @@ Inherits from `BaseDevice` and adds the following methods.
 
 ```javascript
 const obsbot = require('./index');
-obsbot.initSDK();
+obsbot.initSDK(); // use obsbot.initSDK(true); to get debug logs
 
 const devices = obsbot.getDevList();
 const meetDevice = devices.find(d => d instanceof obsbot.MeetDevice);

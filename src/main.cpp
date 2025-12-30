@@ -560,6 +560,28 @@ Napi::Value DeviceWrap::SetGestureControl(const Napi::CallbackInfo& info) {
     return Napi::Number::New(env, result);
 }
 
+static bool g_debugMode = false;
+
+// Custom log handler to suppress messages unless debug mode is enabled
+void CustomLogHandler(int32_t lvl, const char *msg, va_list args, void *p) {
+    if (!g_debugMode) {
+        // Suppress all logs unless debug mode is enabled
+        return;
+    }
+    // prefix message with level in friendly format
+    const char* levelStr = "";
+    switch (lvl) {
+        case DEV_DEBUG: levelStr = "[DEBUG:Obsbot Sdk] "; break;
+        case DEV_INFO: levelStr = "[INFO:Obsbot Sdk] "; break;
+        case DEV_WARN: levelStr = "[WARN:Obsbot Sdk] "; break;
+        case DEV_ERROR: levelStr = "[ERROR:Obsbot Sdk] "; break;
+        default: levelStr = "[UNKNOWN:Obsbot Sdk] "; break;
+    }
+    printf("%s", levelStr);
+    vprintf(msg, args);
+    printf("\n");
+}
+
 Napi::Value GetDevList(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     auto dev_list = Devices::get().getDevList();
@@ -585,8 +607,15 @@ Napi::Value GetDevList(const Napi::CallbackInfo& info) {
 
 Napi::Value InitSDK(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-    // int result = dev_sdk_init(); // This function does not exist.
-    // Initialization is handled by the first call to Devices::get().
+
+    // Check if debug mode is requested
+    if (info.Length() > 0 && info[0].IsBoolean()) {
+        g_debugMode = info[0].As<Napi::Boolean>().Value();
+    } else {
+        g_debugMode = false;
+    }
+
+    // The log handler is already set during module initialization
     Devices::get();
     return Napi::Number::New(env, 0);
 }
@@ -600,6 +629,10 @@ Napi::Value DeInitSDK(const Napi::CallbackInfo& info) {
 }
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    // Set the custom log handler IMMEDIATELY during module load
+    // This ensures it's in place before any SDK initialization
+    dev_set_log_handler(CustomLogHandler, nullptr);
+
     exports.Set("initSDK", Napi::Function::New(env, InitSDK));
     exports.Set("deinitSDK", Napi::Function::New(env, DeInitSDK));
     exports.Set("getDevList", Napi::Function::New(env, GetDevList));
