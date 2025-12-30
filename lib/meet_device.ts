@@ -60,7 +60,7 @@ export class MeetDevice extends BaseDevice {
 	}
 
 	getStatus() {
-		return this._native.getMeetStatus()
+		return this._native.getMeetStatus?.()
 	}
 
 	toggleGestureZoom(enable: boolean) {

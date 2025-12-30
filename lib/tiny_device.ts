@@ -4,7 +4,7 @@ import type {
 	AiSubModeHuman,
 	AiVerticalTrackType,
 	BackgroundMode,
-	AiTrackSpeedType,
+	// AiTrackSpeedType,
 	TinyGestureControl
 } from "../src/types.ts"
 
@@ -65,7 +65,7 @@ export class TinyDevice extends BaseDevice {
 	}
 
 	getStatus() {
-		return this._native.getTinyStatus()
+		return this._native.getTinyStatus?.()
 	}
 
 	// --- AI Control ---

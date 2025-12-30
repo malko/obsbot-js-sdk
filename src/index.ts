@@ -38,6 +38,7 @@ const MEET_FAMILY = [
     ObsbotProductType.ObsbotProdMeet2,
     ObsbotProductType.ObsbotProdMeetSE,
 ]
+
 const TAIL_FAMILY = [
     ObsbotProductType.ObsbotProdTailAir,
     ObsbotProductType.ObsbotProdTail2,
@@ -54,7 +55,10 @@ function deviceFactory(nativeDevice: NativeDevice) {
     if (MEET_FAMILY.includes(productType)) {
         return new MeetDevice(nativeDevice)
     }
-
+    if (TAIL_FAMILY.includes(productType)) {
+        // return new TailDevice(nativeDevice)
+        return new BaseDevice(nativeDevice)
+    }
     // Fallback to the base device for unknown models
     return new BaseDevice(nativeDevice)
 }
