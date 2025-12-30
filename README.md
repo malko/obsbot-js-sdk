@@ -234,3 +234,15 @@ if (nativeDevices.length > 0) {
     console.log(`Got SN from native device: ${sn}`);
 }
 ```
+
+
+## Support this project
+
+If you find this SDK useful, please consider supporting the project:
+
+- **Star the repository**: Give us a star on GitHub to show your support.
+- **Contribute**: Check out the [contributing guidelines](CONTRIBUTING.md) to see how you can help.
+- **Donate**: If you'd like to financially support the development, consider making a donation. If you want more devices to be tested, you can also offer or lend an OBSBOT device for testing new features, as I only own a Tiny SE myself.
+- **Report issues**: If you encounter any bugs or have feature requests, please open an issue on GitHub.
+
+Thank you for your support!
