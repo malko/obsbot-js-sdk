@@ -235,6 +235,9 @@ if (nativeDevices.length > 0) {
 }
 ```
 
+## License
+The original OBSBOT SDK is proprietary software provided by OBSBOT, and this module is a third-party wrapper around that SDK.
+This SDK wrapper is open source and licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
 
 ## Support this project
 
