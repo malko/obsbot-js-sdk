@@ -1,5 +1,24 @@
 import type { GestureControl, ImageSetting, NativeDevice } from "../src/types.ts"
 
+
+export const ObsbotProductTypeName = {
+    0: "Tiny",
+    1: "Tiny 4k",
+    2: "Tiny 2",
+    3: "Tiny 2 Lite",
+    4: "Tail Air",
+    5: "Meet",
+    6: "Meet 4k",
+    7: "Me",
+    8: "HDMI Box",
+    9: "NDI Box",
+    10: "Meet 2",
+    11: "Tail 2",
+    12: "Tiny SE",
+    13: "Meet SE",
+    16: "Tail 2S",
+}
+
 export class BaseDevice {
 	_native: NativeDevice
 	constructor(nativeDevice: NativeDevice) {
@@ -10,6 +29,9 @@ export class BaseDevice {
 	getSn() {
 		return this._native.getSn()
 	}
+	getFamily() {
+		return "Obsbot"
+	}
 
 	getName() {
 		return this._native.getName()
@@ -17,6 +39,19 @@ export class BaseDevice {
 
 	getProductType() {
 		return this._native.getProductType()
+	}
+
+	getProductTypeName() {
+		const type = this.getProductType()
+		return ObsbotProductTypeName[type]
+	}
+
+	getUUID() {
+		return this._native.getUUID()
+	}
+
+	getModelCode() {
+		return this._native.getModelCode()
 	}
 
 	getVideoDevPath() {

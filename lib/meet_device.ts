@@ -2,23 +2,24 @@ import { BaseDevice } from "./base_device.ts"
 import type {
 	MediaMode,
 	BackgroundMode, BackgroundColor,
-	AutoFramingMode, AutoFramingCloseUpperMode
+	AutoFramingMode, AutoFramingCloseUpperMode,
+	MeetGestureControl
 } from "../src/types.ts"
 
-const MediaMode: Record<string, MediaMode> = {
+const MediaMode: Record<'Normal' | 'Background' | 'AutoFrame', MediaMode> = {
 	Normal: 0,
 	Background: 1,
 	AutoFrame: 2,
 }
 
-const BackgroundMode: Record<string, BackgroundMode> = {
+const BackgroundMode: Record<'Disable' | 'Color' | 'Replace' | 'Blur', BackgroundMode> = {
 	Disable: 0,
 	Color: 1,
 	Replace: 17,
 	Blur: 18,
 }
 
-const BackgroundColor: Record<string, BackgroundColor> = {
+const BackgroundColor: Record<'Disable' | 'Null' | 'Blue' | 'Green' | 'Red' | 'Black' | 'White', BackgroundColor> = {
 	Disable: -2,
 	Null: -1,
 	Blue: 0,  // background color: blue
@@ -28,19 +29,19 @@ const BackgroundColor: Record<string, BackgroundColor> = {
 	White: 4, // background color: white
 }
 
-const AutoFramingMode: Record<string, AutoFramingMode> = {
+const AutoFramingMode: Record<'Group' | 'Single' | 'Null', AutoFramingMode> = {
 	Group: 0,
 	Single: 1,
 	Null: -1,
 }
 
-const AutoFramingCloseUpperMode: Record<string, AutoFramingCloseUpperMode> = {
+const AutoFramingCloseUpperMode: Record<'CloseUp' | 'UpperBody' | 'Null', AutoFramingCloseUpperMode> = {
 	CloseUp: 0,
 	UpperBody: 1,
 	Null: -1,
 }
 
-const ResourceAction = {
+const ResourceAction: Record<'Select' | 'Delete' | 'Mirror', number> = {
 	Select: 0,
 	Delete: 1,
 	Mirror: 2,
@@ -54,8 +55,12 @@ export class MeetDevice extends BaseDevice {
 	static AutoFramingSingleMode = AutoFramingCloseUpperMode;
 	static ResourceAction = ResourceAction;
 
+	getFamily() {
+		return super.getFamily() + " Meet"
+	}
+
 	getStatus() {
-		return this._native.getMeetStatus?.()
+		return this._native.getMeetStatus()
 	}
 
 	toggleGestureZoom(enable: boolean) {
@@ -88,5 +93,9 @@ export class MeetDevice extends BaseDevice {
 
 	deleteBackgroundImage(index: number) {
 		return this._native.setResourceAction?.(ResourceAction.Delete, index)
+	}
+
+	_setGestureControl(gesture:  MeetGestureControl, enable: boolean): boolean {
+		return this._native.setGestureControl(gesture, enable)
 	}
 }

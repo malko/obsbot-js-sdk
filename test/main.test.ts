@@ -1,4 +1,5 @@
-const obsbot = require('../src/index.ts');
+import { osbotSdk as obsbot} from '../src/index.ts';
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 describe('OBSBOT SDK Module', () => {
   beforeEach(() => {
@@ -7,12 +8,12 @@ describe('OBSBOT SDK Module', () => {
   });
 
   it('should initialize and de-initialize the SDK', () => {
-    expect(obsbot.initSDK).not.toHaveBeenCalled();
-    obsbot.initSDK();
+    expect(obsbot.init).not.toHaveBeenCalled();
+    obsbot.init();
     expect(obsbot.native.initSDK).toHaveBeenCalledTimes(1);
 
-    expect(obsbot.deinitSDK).not.toHaveBeenCalled();
-    obsbot.deinitSDK();
+    expect(obsbot.release).not.toHaveBeenCalled();
+    obsbot.release();
     expect(obsbot.native.deinitSDK).toHaveBeenCalledTimes(1);
   });
 

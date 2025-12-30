@@ -72,13 +72,14 @@ private:
     Napi::Value GetSn(const Napi::CallbackInfo& info);
     Napi::Value GetName(const Napi::CallbackInfo& info);
     Napi::Value GetProductType(const Napi::CallbackInfo& info);
+    Napi::Value GetUUID(const Napi::CallbackInfo& info);
+    Napi::Value GetModelCode(const Napi::CallbackInfo& info);
     Napi::Value GimbalReset(const Napi::CallbackInfo& info);
     Napi::Value GimbalMove(const Napi::CallbackInfo& info);
     Napi::Value SetZoom(const Napi::CallbackInfo& info);
     // New methods for AI, Zoom, and Presets
     Napi::Value GetZoom(const Napi::CallbackInfo& info);
     Napi::Value GetZoomRange(const Napi::CallbackInfo& info);
-    Napi::Value GetAiStatus(const Napi::CallbackInfo& info);
     Napi::Value SetAiTrackingMode(const Napi::CallbackInfo& info);
     Napi::Value SetAiMode(const Napi::CallbackInfo& info);
     Napi::Value GetPresetList(const Napi::CallbackInfo& info);
@@ -103,6 +104,9 @@ private:
     Napi::Value GetCapabilities(const Napi::CallbackInfo& info);
     // New method for gesture control
     Napi::Value SetGestureControl(const Napi::CallbackInfo& info);
+    // New method for tiny status
+    Napi::Value GetTinyStatus(const Napi::CallbackInfo& info);
+
 };
 
 Napi::FunctionReference DeviceWrap::constructor;
@@ -113,13 +117,14 @@ Napi::Object DeviceWrap::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("getSn", &DeviceWrap::GetSn),
         InstanceMethod("getName", &DeviceWrap::GetName),
         InstanceMethod("getProductType", &DeviceWrap::GetProductType),
+        InstanceMethod("getUUID", &DeviceWrap::GetUUID),
+        InstanceMethod("getModelCode", &DeviceWrap::GetModelCode),
         InstanceMethod("gimbalReset", &DeviceWrap::GimbalReset),
         InstanceMethod("gimbalMove", &DeviceWrap::GimbalMove),
         InstanceMethod("setZoom", &DeviceWrap::SetZoom),
         // New methods
         InstanceMethod("getZoom", &DeviceWrap::GetZoom),
         InstanceMethod("getZoomRange", &DeviceWrap::GetZoomRange),
-        InstanceMethod("getAiStatus", &DeviceWrap::GetAiStatus),
         InstanceMethod("setAiTrackingMode", &DeviceWrap::SetAiTrackingMode),
         InstanceMethod("setAiMode", &DeviceWrap::SetAiMode),
         InstanceMethod("getPresetList", &DeviceWrap::GetPresetList),
@@ -144,6 +149,8 @@ Napi::Object DeviceWrap::Init(Napi::Env env, Napi::Object exports) {
         InstanceMethod("getCapabilities", &DeviceWrap::GetCapabilities),
         // New method for gesture control
         InstanceMethod("setGestureControl", &DeviceWrap::SetGestureControl),
+        // New method for tiny status
+        InstanceMethod("getTinyStatus", &DeviceWrap::GetTinyStatus),
     });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -171,6 +178,23 @@ Napi::Value DeviceWrap::GetName(const Napi::CallbackInfo& info) {
 
 Napi::Value DeviceWrap::GetProductType(const Napi::CallbackInfo& info) {
     return Napi::Number::New(info.Env(), device_ ? device_->productType() : -1);
+}
+
+Napi::Value DeviceWrap::GetUUID(const Napi::CallbackInfo& info) {
+    if (!device_) return info.Env().Undefined();
+    const auto& uuid = device_->uuid();
+    // Convert uuid (std::array<uint8_t, DEV_UUID_SIZE>) to hex string
+    std::string uuidStr;
+    for (auto b : uuid) {
+        char buf[3];
+        snprintf(buf, sizeof(buf), "%02x", b);
+        uuidStr += buf;
+    }
+    return Napi::String::New(info.Env(), uuidStr);
+}
+
+Napi::Value DeviceWrap::GetModelCode(const Napi::CallbackInfo& info) {
+    return Napi::String::New(info.Env(), device_ ? device_->devModelCode() : "");
 }
 
 Napi::Value DeviceWrap::GimbalReset(const Napi::CallbackInfo& info) {
@@ -221,39 +245,6 @@ Napi::Value DeviceWrap::GetZoomRange(const Napi::CallbackInfo& info) {
     rangeObj.Set("max", Napi::Number::New(env, range.max_));
     rangeObj.Set("default", Napi::Number::New(env, range.default_));
     return rangeObj;
-}
-
-Napi::Value DeviceWrap::GetAiStatus(const Napi::CallbackInfo& info) {
-    Napi::Env env = info.Env();
-    Device::CameraStatus status;
-    if (device_) {
-        // Use cameraGetCameraStatusU as it provides more reliable live data for Tiny series
-        device_->cameraGetCameraStatusU(status);
-    }
-    Napi::Object statusObj = Napi::Object::New(env);
-    // Populate from the 'tiny' part of the CameraStatus union
-    statusObj.Set("ai_target", Napi::Number::New(env, status.tiny.ai_target));
-    statusObj.Set("hdr", Napi::Number::New(env, status.tiny.hdr));
-    statusObj.Set("face_ae", Napi::Number::New(env, status.tiny.face_ae));
-    statusObj.Set("dev_status", Napi::Number::New(env, status.tiny.dev_status));
-    statusObj.Set("vertical_mode", Napi::Number::New(env, status.tiny.vertical));
-    statusObj.Set("face_auto_focus", Napi::Number::New(env, status.tiny.face_auto_focus));
-    statusObj.Set("auto_focus", Napi::Number::New(env, status.tiny.auto_focus));
-    statusObj.Set("ai_mode", Napi::Number::New(env, status.tiny.ai_mode));
-    statusObj.Set("ai_sub_mode", Napi::Number::New(env, status.tiny.ai_sub_mode));
-    statusObj.Set("led_brightness_level", Napi::Number::New(env, status.tiny.led_brightness_level));
-
-    // Also get gesture info from the other status call for completeness
-    Device::AiStatus gestureStatus;
-    if (device_) {
-        device_->aiGetAiStatusR(&gestureStatus);
-    }
-    statusObj.Set("gesture_target", Napi::Boolean::New(env, gestureStatus.gesture_target));
-    statusObj.Set("gesture_zoom", Napi::Boolean::New(env, gestureStatus.gesture_zoom));
-    statusObj.Set("gesture_dynamic_zoom", Napi::Boolean::New(env, gestureStatus.gesture_dynamic_zoom));
-    statusObj.Set("gesture_mirror", Napi::Boolean::New(env, gestureStatus.gesture_mirror));
-
-    return statusObj;
 }
 
 Napi::Value DeviceWrap::SetAiTrackingMode(const Napi::CallbackInfo& info) {
@@ -484,6 +475,58 @@ Napi::Value DeviceWrap::GetMeetStatus(const Napi::CallbackInfo& info) {
     statusObj.Set("auto_focus", Napi::Boolean::New(env, status.meet.auto_focus));
     statusObj.Set("manual_focus_value", Napi::Number::New(env, status.meet.manual_focus_value));
     statusObj.Set("image_flip_hor", Napi::Boolean::New(env, status.meet.image_flip_hor));
+    return statusObj;
+}
+
+Napi::Value DeviceWrap::GetTinyStatus(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::Object statusObj = Napi::Object::New(env);
+
+    if (!device_) {
+        return statusObj;
+    }
+
+    // Get gimbal attitude
+    float xyz[3]; // roll, pitch, pan
+    if (device_->gimbalGetAttitudeInfoR(xyz) == RM_RET_OK) {
+        Napi::Object gimbalObj = Napi::Object::New(env);
+        gimbalObj.Set("roll", Napi::Number::New(env, xyz[0]));
+        gimbalObj.Set("pitch", Napi::Number::New(env, xyz[1]));
+        gimbalObj.Set("pan", Napi::Number::New(env, xyz[2]));
+        statusObj.Set("gimbal", gimbalObj);
+    }
+
+    // Get zoom
+    float zoom = 0.0;
+    if (device_->cameraGetZoomAbsoluteR(zoom) == RM_RET_OK) {
+        statusObj.Set("zoom", Napi::Number::New(env, zoom));
+    }
+
+    // Get camera status
+    Device::CameraStatus status;
+    if (device_->cameraGetCameraStatusU(status) == RM_RET_OK) {
+        statusObj.Set("ai_target", Napi::Number::New(env, status.tiny.ai_target));
+        statusObj.Set("hdr", Napi::Number::New(env, status.tiny.hdr));
+        statusObj.Set("face_ae", Napi::Number::New(env, status.tiny.face_ae));
+        statusObj.Set("dev_status", Napi::Number::New(env, status.tiny.dev_status));
+        statusObj.Set("vertical_mode", Napi::Number::New(env, status.tiny.vertical));
+        statusObj.Set("face_auto_focus", Napi::Number::New(env, status.tiny.face_auto_focus));
+        statusObj.Set("auto_focus", Napi::Number::New(env, status.tiny.auto_focus));
+        statusObj.Set("ai_mode", Napi::Number::New(env, status.tiny.ai_mode));
+        statusObj.Set("ai_sub_mode", Napi::Number::New(env, status.tiny.ai_sub_mode));
+        statusObj.Set("led_brightness_level", Napi::Number::New(env, status.tiny.led_brightness_level));
+        statusObj.Set("zoom_ratio", Napi::Number::New(env, status.tiny.zoom_ratio));
+    }
+
+    // Get AI gesture status
+    Device::AiStatus gestureStatus;
+    if (device_->aiGetAiStatusR(&gestureStatus) == RM_RET_OK) {
+        statusObj.Set("gesture_target", Napi::Boolean::New(env, gestureStatus.gesture_target));
+        statusObj.Set("gesture_zoom", Napi::Boolean::New(env, gestureStatus.gesture_zoom));
+        statusObj.Set("gesture_dynamic_zoom", Napi::Boolean::New(env, gestureStatus.gesture_dynamic_zoom));
+        statusObj.Set("gesture_mirror", Napi::Boolean::New(env, gestureStatus.gesture_mirror));
+    }
+
     return statusObj;
 }
 

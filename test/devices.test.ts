@@ -1,4 +1,5 @@
-const obsbot = require('../src/index.ts');
+import { osbotSdk as obsbot} from '../src/index.ts';
+import { describe, it, expect, beforeAll, beforeEach, jest } from '@jest/globals';
 
 describe('Device Classes', () => {
   let tinyDevice;

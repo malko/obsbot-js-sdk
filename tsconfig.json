@@ -1,8 +1,12 @@
 {
 	"compilerOptions": {
 		"module": "nodenext",
+		"target": "esnext",
+		"moduleResolution": "nodenext",
 		"allowImportingTsExtensions": true,
 		"erasableSyntaxOnly": true,
-		"noEmit": true
+		"esModuleInterop": true,
+		"noEmit": true,
+		"isolatedModules": true
 	}
 }
