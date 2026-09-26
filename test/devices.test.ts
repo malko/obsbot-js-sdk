@@ -1,14 +1,16 @@
+import type { MeetDevice } from '../lib/meet_device.ts';
+import type { TinyDevice } from '../lib/tiny_device.ts';
 import { osbotSdk as obsbot} from '../src/index.ts';
 import { describe, it, expect, beforeAll, beforeEach, jest } from '@jest/globals';
 
 describe('Device Classes', () => {
-  let tinyDevice;
-  let meetDevice;
+  let tinyDevice: TinyDevice;
+  let meetDevice: MeetDevice;
 
   beforeAll(() => {
     const devices = obsbot.getDevList();
-    tinyDevice = devices.find(d => d instanceof obsbot.TinyDevice);
-    meetDevice = devices.find(d => d instanceof obsbot.MeetDevice);
+    tinyDevice = devices.find(d => d instanceof obsbot.TinyDevice)!;
+    meetDevice = devices.find(d => d instanceof obsbot.MeetDevice)!;
   });
 
   beforeEach(() => {
@@ -35,6 +37,7 @@ describe('Device Classes', () => {
     });
 
     it('should not have Meet-specific methods', () => {
+      // @ts-expect-error
       expect(tinyDevice.setMediaMode).toBeUndefined();
     });
 
@@ -50,6 +53,7 @@ describe('Device Classes', () => {
     });
 
     it('should not have Tiny-specific methods', () => {
+      // @ts-expect-error
       expect(meetDevice.setAiMode).toBeUndefined();
     });
 

@@ -1,7 +1,7 @@
 import type { GestureControl, ImageSetting, NativeDevice } from "../src/types.ts"
 
 
-export const ObsbotProductTypeName = {
+export const ObsbotProductTypeName:Record<number, string> = {
     0: "Tiny",
     1: "Tiny 4k",
     2: "Tiny 2",
